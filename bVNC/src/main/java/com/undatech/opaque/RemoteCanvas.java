@@ -69,7 +69,7 @@ import com.undatech.opaque.proxmox.pojo.SpiceDisplay;
 import com.undatech.opaque.proxmox.pojo.VmStatus;
 import com.undatech.remoteClientUi.R;
 
-public class RemoteCanvas extends android.support.v7.widget.AppCompatImageView implements Viewable {
+public class RemoteCanvas extends androidx.appcompat.widget.AppCompatImageView implements Viewable {
     private final static String TAG = "RemoteCanvas";
     
     public Handler handler;

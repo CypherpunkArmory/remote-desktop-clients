@@ -6,9 +6,9 @@
           android:versionCode="115036" android:versionName="v5.0.3">
 
     <uses-permission tools:node="removeAll"/>
-    <uses-permission android:name="android.permission.INTERNET"> </uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"> </uses-permission>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"> </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"> </uses-permission>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"> </uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"> </uses-permission>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -28,8 +28,7 @@
         android:label="${custom_vnc_app_name}"
         android:allowBackup="false"
         android:theme="@style/AppTheme"
-        android:name="com.iiordanov.bVNC.App"
-        tools:replace="android:label,android:theme">
+        android:name="com.iiordanov.bVNC.App">
                 <activity android:name="com.undatech.opaque.ConnectionGridActivity"
                           android:configChanges="keyboardHidden"
                           android:label="${custom_vnc_app_name}"
@@ -104,4 +103,4 @@
         <activity android:name=".presentation.ShortcutsActivity" tools:node="remove"/>
         <meta-data android:name="com.samsung.android.keepalive.density" android:value="true"/>
     </application>
-</manifest> 
+</manifest>

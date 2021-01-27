@@ -34,15 +34,10 @@ dependencies {
     implementation project(':pubkeyGenerator')
     implementation project(':freeRDPCore')
     implementation project(':remoteClientLib')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:support-vector-drawable:28.0.0'
-    implementation 'com.android.support:preference-v7:28.0.0'
-    // TODO: The libraries included in freeRdpCore clash with the following new libraries
-    //implementation group: 'androidx.appcompat', name: 'appcompat', version: '1.2.0'
-    //implementation group: 'androidx.legacy', name: 'legacy-support-v4', version: '1.0.0'
-    //implementation group: 'androidx.vectordrawable', name: 'vectordrawable', version: '1.1.0'
-    //implementation group: 'androidx.preference', name: 'preference', version: '1.1.1'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.vectordrawable:vectordrawable:1.0.0'
+    implementation 'androidx.preference:preference:1.0.0'
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
     implementation files('libs/com.antlersoft.android.contentxml.jar')
     implementation files('libs/com.antlersoft.android.db.jar')
