@@ -1,10 +1,10 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
 
     defaultConfig {
-        targetSdkVersion 29
+        targetSdkVersion 28
         minSdkVersion project.getProperties().get("SDK_VERSION")
         multiDexEnabled true
         manifestPlaceholders = [
@@ -19,7 +19,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

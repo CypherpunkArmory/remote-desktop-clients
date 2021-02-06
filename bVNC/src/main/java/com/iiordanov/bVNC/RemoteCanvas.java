@@ -217,10 +217,10 @@ public class RemoteCanvas extends androidx.appcompat.widget.AppCompatImageView
         super(context, attrs);
 
         clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        isVnc = Utils.isVnc(getContext().getPackageName());
-        isRdp = Utils.isRdp(getContext().getPackageName());
-        isSpice = Utils.isSpice(getContext().getPackageName());
-        isOpaque = Utils.isOpaque(getContext().getPackageName());
+        isVnc = true;
+        isRdp = false;
+        isSpice = false;
+        isOpaque = false;
 
         final Display display = ((Activity) context).getWindow().getWindowManager().getDefaultDisplay();
         displayWidth = display.getWidth();
