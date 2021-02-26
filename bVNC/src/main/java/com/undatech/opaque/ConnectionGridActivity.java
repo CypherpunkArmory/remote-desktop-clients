@@ -386,6 +386,8 @@ public class ConnectionGridActivity extends FragmentActivity implements GetTextF
             updateInputMenu(menu.findItem(R.id.itemInputMode).getSubMenu());
             MenuItem itemMasterPassword = menu.findItem(R.id.itemMasterPassword);
             itemMasterPassword.setChecked(Utils.querySharedPreferenceBoolean(this, Constants.masterPasswordEnabledTag));
+            MenuItem itemShowToolbarDisabled = menu.findItem(R.id.itemShowToolbarDisabled);
+            itemShowToolbarDisabled.setChecked(Utils.querySharedPreferenceBoolean(this, Constants.showToolbarDisabledTag));
         } catch (NullPointerException e) {}
         return true;
     }
@@ -446,6 +448,8 @@ public class ConnectionGridActivity extends FragmentActivity implements GetTextF
                     showGetTextFragment(getNewPassword);
                 }
             }
+        } else if (itemId == R.id.itemShowToolbarDisabled) {
+            Utils.toggleSharedPreferenceBoolean(this, Constants.showToolbarDisabledTag);
         } else if (item.getGroupId() == R.id.itemInputModeGroup) {
             Log.e(TAG, RemoteCanvasActivity.inputModeMap.get(item.getItemId()));
             Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag,

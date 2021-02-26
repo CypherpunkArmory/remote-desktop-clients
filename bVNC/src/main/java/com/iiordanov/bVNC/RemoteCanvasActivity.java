@@ -1577,7 +1577,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     ToolbarHiderRunnable toolbarHider = new ToolbarHiderRunnable();
     
     public void showToolbar() {
-        getSupportActionBar().show();
+        boolean extraKeysVisible = layoutKeys.getVisibility() == View.VISIBLE;
+        boolean showToolbarDisabled = isShowToolbarDisabled();
+        if (!showToolbarDisabled || extraKeysVisible) {
+            getSupportActionBar().show();
+        }
         handler.removeCallbacks(toolbarHider);
         handler.postAtTime(toolbarHider, SystemClock.uptimeMillis() + hideToolbarDelay);
     }
@@ -1694,6 +1698,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     private boolean isMasterPasswordEnabled() {
         SharedPreferences sp = getSharedPreferences(Constants.generalSettingsTag, Context.MODE_PRIVATE);
         return sp.getBoolean(Constants.masterPasswordEnabledTag, false);
+    }
+
+    private boolean isShowToolbarDisabled() {
+        SharedPreferences sp = getSharedPreferences(Constants.generalSettingsTag, Context.MODE_PRIVATE);
+        return sp.getBoolean(Constants.showToolbarDisabledTag, false);
     }
 
     @Override
