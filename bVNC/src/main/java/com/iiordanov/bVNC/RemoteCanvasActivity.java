@@ -109,6 +109,7 @@ import com.undatech.opaque.OpaqueHandler;
 import com.undatech.opaque.RemoteClientLibConstants;
 import com.undatech.opaque.util.FileUtils;
 import com.undatech.opaque.util.OnTouchViewMover;
+import com.undatech.remoteClientUi.BuildConfig;
 import com.undatech.remoteClientUi.R;
 
 public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyListener,
@@ -311,6 +312,12 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         connection = null;
         
         Uri data = i.getData();
+        Bundle extras = i.getExtras();
+
+        if (extras != null) {
+            Utils.setSharedPreferenceBoolean(this, Constants.showToolbarDisabledTag, extras.getBoolean("hide_toolbar",false));
+            Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
+        }
         
         boolean isSupportedScheme = false;
         if (data != null) {
@@ -356,7 +363,6 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
             }
         } else {
         	connection = new ConnectionBean(this);
-            Bundle extras = i.getExtras();
 
             if (extras != null) {
                   connection.populateFromContentValues((ContentValues) extras.getParcelable(Utils.getConnectionString(this)));
