@@ -446,7 +446,10 @@ public class RemoteCanvas extends androidx.appcompat.widget.AppCompatImageView
                     }
                     error = error + "<br>" + e.getLocalizedMessage();
                 }
-                showFatalMessageAndQuit(error);
+                if (error.equals(getContext().getString(R.string.error_connection_failed)))
+                    ((Activity) getContext()).finish();
+                else
+                    showFatalMessageAndQuit(error);
             }
         }
     }
