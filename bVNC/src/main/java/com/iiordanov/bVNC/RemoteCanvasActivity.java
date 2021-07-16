@@ -74,6 +74,7 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
@@ -252,6 +253,13 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
 
         canvas = (RemoteCanvas) findViewById(R.id.canvas);
 
+        canvas.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                initKeyboard();
+            }
+        });
+
         if (android.os.Build.VERSION.SDK_INT >= 9) {
             android.os.StrictMode.ThreadPolicy policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();
             android.os.StrictMode.setThreadPolicy(policy);
@@ -386,6 +394,20 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
                 connection.setSshPort(Constants.DEFAULT_SSH_PORT);
         }
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
+    }
+
+    void initKeyboard () {
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+
+        if (extras != null) {
+            if (extras.getBoolean("show_keyboard",false)) {
+                showKeyboard();
+            }
+            if (extras.getBoolean("hide_keyboard",false)) {
+                hideKeyboard();
+            }
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
