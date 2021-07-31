@@ -393,6 +393,9 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
             if (connection.getSshPort() == 0)
                 connection.setSshPort(Constants.DEFAULT_SSH_PORT);
         }
+        if (extras != null) {
+            connection.setExtraKeysToggleType(extras.getBoolean("hide_extra_keys", false) ? Constants.EXTRA_KEYS_OFF : Constants.EXTRA_KEYS_ON);
+        }
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
     }
 
