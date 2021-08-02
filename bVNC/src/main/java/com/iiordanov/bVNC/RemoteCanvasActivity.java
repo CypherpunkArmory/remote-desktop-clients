@@ -127,6 +127,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     private MenuItem[] inputModeMenuItems;
     private MenuItem[] scalingModeMenuItems;
     private InputHandler inputModeHandlers[];
+    private Handler commandHandler;
     private Connection connection;
     public static final int[] inputModeIds = { R.id.itemInputTouchpad,
                                                 R.id.itemInputTouchPanZoomMouse,
@@ -236,6 +237,24 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         }
     }
 
+    private String commandDir = "";
+    private Runnable commandChecker = new Runnable() {
+        @Override
+        public void run() {
+            File showKeyboard = new File(commandDir+"/showKeyboard");
+            if (showKeyboard.exists()) {
+                showKeyboard.delete();
+                showKeyboard();
+            }
+            File hideKeyboard = new File(commandDir+"/hideKeyboard");
+            if (hideKeyboard.exists()) {
+                hideKeyboard.delete();
+                hideKeyboard();
+            }
+            commandHandler.postDelayed(commandChecker, 100);
+        }
+    };
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -252,13 +271,6 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         setContentView(R.layout.canvas);
 
         canvas = (RemoteCanvas) findViewById(R.id.canvas);
-
-        canvas.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                initKeyboard();
-            }
-        });
 
         if (android.os.Build.VERSION.SDK_INT >= 9) {
             android.os.StrictMode.ThreadPolicy policy = new android.os.StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -295,6 +307,16 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
                 } catch (NullPointerException e) {
                 }
             }};
+
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+
+        if (extras != null) {
+            commandDir = extras.getString("command_dir", "");
+        }
+
+        commandHandler = new Handler();
+        commandChecker.run();
 
         if (Utils.isOpaque(getPackageName())) {
             initializeOpaque(setModes, hideKeyboardAndExtraKeys);
@@ -397,20 +419,6 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
             connection.setExtraKeysToggleType(extras.getBoolean("hide_extra_keys", false) ? Constants.EXTRA_KEYS_OFF : Constants.EXTRA_KEYS_ON);
         }
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
-    }
-
-    void initKeyboard () {
-        Intent i = getIntent();
-        Bundle extras = i.getExtras();
-
-        if (extras != null) {
-            if (extras.getBoolean("show_keyboard",false)) {
-                showKeyboard();
-            }
-            if (extras.getBoolean("hide_keyboard",false)) {
-                hideKeyboard();
-            }
-        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -1477,6 +1485,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        commandHandler.removeCallbacks(commandChecker);
         if (canvas != null)
             canvas.closeConnection();
         System.gc();
