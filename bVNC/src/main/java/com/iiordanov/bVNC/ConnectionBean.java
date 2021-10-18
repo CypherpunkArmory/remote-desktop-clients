@@ -107,7 +107,7 @@ public class ConnectionBean extends AbstractConnectionBean implements Connection
         setTlsPort(-1);
         setCertSubject("");
         setColorModel(COLORMODEL.C24bit.nameString());
-        setPrefEncoding(RfbProto.EncodingTight);
+        setPrefEncoding(RfbProto.EncodingRaw);
         setScaleMode(ScaleType.FIT_CENTER);
         setInputMode(inputMode);
         setUseDpadAsArrows(true);

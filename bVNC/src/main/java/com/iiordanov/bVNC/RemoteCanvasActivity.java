@@ -348,7 +348,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
             Utils.setSharedPreferenceBoolean(this, Constants.showToolbarDisabledTag, extras.getBoolean("hide_toolbar",false));
             Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
         }
-        
+
         boolean isSupportedScheme = false;
         if (data != null) {
             String s = data.getScheme();
@@ -418,6 +418,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         if (extras != null) {
             connection.setExtraKeysToggleType(extras.getBoolean("hide_extra_keys", false) ? Constants.EXTRA_KEYS_OFF : Constants.EXTRA_KEYS_ON);
         }
+        connection.setPrefEncoding(RfbProto.EncodingRaw);
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
     }
 
