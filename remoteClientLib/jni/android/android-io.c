@@ -46,6 +46,7 @@ Java_com_undatech_opaque_SpiceCommunicator_UpdateBitmap (JNIEnv* env, jobject ob
 			destpix[j + 0] = sourcepix[j + 2];
 			destpix[j + 1] = sourcepix[j + 1];
 			destpix[j + 2] = sourcepix[j + 0];
+			destpix[j + 3] = 0xff;
 		}
 		sourcepix = sourcepix + slen;
 		destpix   = destpix + slen;
@@ -95,6 +96,7 @@ Java_com_undatech_opaque_SpiceCommunicator_SpiceRequestResolution(JNIEnv* env, j
 
     spice_main_channel_update_display_enabled(d->main, get_display_id(display), TRUE, FALSE);
     spice_main_channel_update_display(d->main, get_display_id(display), 0, 0, x, y, TRUE);
+    spice_main_channel_send_monitor_config(d->main);
 }
 
 
@@ -207,4 +209,16 @@ void uiCallbackSettingsChanged (gint instance, gint width, gint height, gint bpp
 
 void uiCallbackMouseMode(JNIEnv *env, gboolean relative) {
     (*env)->CallStaticVoidMethod(env, jni_connector_class, jni_mouse_mode, relative);
+}
+
+void uiCallbackShowMessage(const gchar *message_text) {
+    __android_log_write(ANDROID_LOG_DEBUG, "android-io", "uiCallbackShowMessage");
+    JNIEnv *env = NULL;
+    gboolean attached = attachThreadToJvm (&env);
+    jstring jmessage = (*env)->NewStringUTF(env, message_text);
+    (*env)->CallStaticVoidMethod(env, jni_connector_class, jni_show_message, jmessage);
+
+    if (attached) {
+    	detachThreadFromJvm ();
+    }
 }

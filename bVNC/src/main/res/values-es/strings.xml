@@ -31,7 +31,7 @@
     <string name="connection_setup_vm_name">Nombre de la máquina virtual (opcional)</string>
     <string name="connection_setup_host_name">Dirección del servidor</string>
     <string name="connection_setup_user">Usuario@dominio</string>
-    <string name="connection_setup_password">Contraseña (guardada si se ingresó)</string>
+    <string name="connection_setup_password">Contraseña</string>
     <string name="enter_password">Por favor, ingrese contraseña</string>
     <string name="enter_otp_code">Por favor, ingrese el código OTP</string>
     <string name="hide_toolbar">Esconder barra de herramientas</string>
@@ -544,6 +544,8 @@ Si está buscando un aumento rápido del rendimiento, intente configurar el modo
     <string name="port_ssh_hint">Puerto</string>
 
     <string name="portrait_mode">Cambia al modo vertical cuando está conectado</string>
+    <string name="position_toolbar_last_used">Restore Toolbar Position</string>
+    <string name="position_toolbar_last_used_summary">(Applies to New Connections Only)</string>
 
     <string name="pro_feature_mfa">Parece que su servidor tiene habilitada la autenticación multifactor. Apoye el proyecto comprando la versión Pro que tiene soporte para esta función. Un enlace a la versión Pro está disponible en el cuadro de diálogo de inicio.</string>
 

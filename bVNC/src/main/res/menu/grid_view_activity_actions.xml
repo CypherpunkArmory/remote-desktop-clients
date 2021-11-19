@@ -32,10 +32,4 @@
         android:showAsAction="ifRoom"
         app:showAsAction="ifRoom"
         android:onClick="showMainScreenHelp" />
-
-    <item
-        android:id="@+id/itemShowToolbarDisabled"
-        android:checkable="true"
-        android:title="@string/hide_toolbar"
-        app:showAsAction="never" />
 </menu>

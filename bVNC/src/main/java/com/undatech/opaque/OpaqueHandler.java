@@ -14,8 +14,11 @@ import android.os.Message;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import android.util.Base64;
+import android.widget.Toast;
 
+import com.iiordanov.bVNC.Utils;
 import com.iiordanov.bVNC.dialogs.GetTextFragment;
+import com.iiordanov.bVNC.input.RemoteCanvasHandler;
 import com.undatech.opaque.dialogs.ChoiceFragment;
 import com.undatech.opaque.dialogs.MessageFragment;
 import com.undatech.opaque.dialogs.SelectTextElementFragment;
@@ -39,11 +42,6 @@ public class OpaqueHandler extends Handler {
         this.settings = settings;
         this.fm = ((FragmentActivity)context).getSupportFragmentManager();
     }
-    
-    private void showGetTextFragmentOpaque(String id, String title, boolean password) {
-        com.undatech.opaque.dialogs.GetTextFragment frag = com.undatech.opaque.dialogs.GetTextFragment.newInstance(id, title, (RemoteCanvasActivity)context, password);
-        frag.show(fm, id);
-    }
 
     private void showGetTextFragmentRemoteCanvas(String tag, String dialogId, String title,
                                                  GetTextFragment.OnFragmentDismissedListener dismissalListener,
@@ -66,7 +64,7 @@ public class OpaqueHandler extends Handler {
                 new MessageFragment.OnFragmentDismissedListener() {
                     @Override
                     public void onDialogDismissed() {
-                        ((Activity)context).finish();
+                        MessageDialogs.justFinish(context);
                     }
                 });
         message.show(fm, "endingDialog");
@@ -80,6 +78,8 @@ public class OpaqueHandler extends Handler {
             android.util.Log.d(TAG, "Ignoring message with ID 0");
             return;
         }
+        final String messageText = Utils.getStringFromMessage(msg, "message");
+
         switch (msg.what) {
         case RemoteClientLibConstants.VV_OVER_HTTP_FAILURE:
             MessageDialogs.displayMessageAndFinish(context, R.string.error_failed_to_download_vv_http,
@@ -145,15 +145,26 @@ public class OpaqueHandler extends Handler {
             String uriString = "vnc://" + address + ":" + port + "?VncPassword=" + password;
             Intent intent = new Intent(Intent.ACTION_VIEW).setType("application/vnd.vnc").setData(Uri.parse(uriString));
             context.startActivity(intent);
-            ((Activity)context).finish();
+            MessageDialogs.justFinish(context);
             break;
         case RemoteClientLibConstants.GET_PASSWORD:
-            c.pd.dismiss();
-            showGetTextFragmentOpaque(RemoteClientLibConstants.GET_PASSWORD_ID, context.getString(R.string.enter_password), true);
+            showGetTextFragmentRemoteCanvas(context.getString(R.string.enter_password),
+                    GetTextFragment.DIALOG_ID_GET_OPAQUE_PASSWORD,
+                    context.getString(R.string.enter_password),
+                    c, GetTextFragment.Password,
+                    R.string.enter_password, R.string.enter_password,
+                    settings.getPassword(), null, null,
+                    settings.getKeepPassword());
             break;
         case RemoteClientLibConstants.GET_OTP_CODE:
             c.pd.dismiss();
-            showGetTextFragmentOpaque(RemoteClientLibConstants.GET_OTP_CODE_ID, context.getString(R.string.enter_otp_code), false);
+            showGetTextFragmentRemoteCanvas(context.getString(R.string.enter_otp_code),
+                    GetTextFragment.DIALOG_ID_GET_OPAQUE_OTP_CODE,
+                    context.getString(R.string.enter_otp_code),
+                    c, GetTextFragment.Plaintext,
+                    R.string.enter_otp_code, R.string.enter_otp_code,
+                    null, null, null,
+                    false);
             break;
         case RemoteClientLibConstants.PVE_FAILED_TO_AUTHENTICATE:
             if (c.retrievevvFileName() != null) {
@@ -169,7 +180,7 @@ public class OpaqueHandler extends Handler {
                         c, GetTextFragment.Credentials,
                         R.string.enter_password_auth_failed, R.string.enter_password_auth_failed,
                         settings.getUserName(), settings.getPassword(), null,
-                        true);
+                        settings.getKeepPassword());
                 break;
             }
         case RemoteClientLibConstants.OVIRT_AUTH_FAILURE:
@@ -185,7 +196,7 @@ public class OpaqueHandler extends Handler {
                         c, GetTextFragment.Credentials,
                         R.string.enter_password_auth_failed, R.string.enter_password_auth_failed,
                         settings.getUserName(), settings.getPassword(), null,
-                        true);
+                        settings.getKeepPassword());
                 break;
             }
         case RemoteClientLibConstants.DIALOG_DISPLAY_VMS:
@@ -230,10 +241,34 @@ public class OpaqueHandler extends Handler {
             break;
         case RemoteClientLibConstants.DISCONNECT_NO_MESSAGE:
             c.closeConnection();
-            ((Activity)context).finish();
+            MessageDialogs.justFinish(context);
+            break;
+        case RemoteClientLibConstants.SHOW_TOAST:
+            this.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(context, Utils.getStringResourceByName(context, messageText),
+                                        Toast.LENGTH_LONG).show();
+                }
+            });
             break;
         case RemoteClientLibConstants.REINIT_SESSION:
             c.reinitializeOpaque();
+            break;
+        case RemoteClientLibConstants.REPORT_TOOLBAR_POSITION:
+            android.util.Log.d(TAG, "Handling message, REPORT_TOOLBAR_POSITION");
+            if (settings.getUseLastPositionToolbar()) {
+                int useLastPositionToolbarX = Utils.getIntFromMessage(msg, "useLastPositionToolbarX");
+                int useLastPositionToolbarY = Utils.getIntFromMessage(msg, "useLastPositionToolbarY");
+                boolean useLastPositionToolbarMoved = Utils.getBooleanFromMessage(msg, "useLastPositionToolbarMoved");
+                android.util.Log.d(TAG, "Handling message, REPORT_TOOLBAR_POSITION, X Coordinate" + useLastPositionToolbarX);
+                android.util.Log.d(TAG, "Handling message, REPORT_TOOLBAR_POSITION, Y Coordinate" + useLastPositionToolbarY);
+                settings.setUseLastPositionToolbarX(useLastPositionToolbarX);
+                settings.setUseLastPositionToolbarY(useLastPositionToolbarY);
+                settings.setUseLastPositionToolbarMoved(useLastPositionToolbarMoved);
+            }
+            break;
+        default:
+            android.util.Log.e(TAG, "Not handling unknown messageId: " + msg.what);
             break;
         }
     }
@@ -297,7 +332,7 @@ public class OpaqueHandler extends Handler {
                             }
                         } else {
                             android.util.Log.e(TAG, "We were told not to continue");
-                            ((Activity)context).finish();
+                            MessageDialogs.justFinish(context);
                         }
                     }
                 });

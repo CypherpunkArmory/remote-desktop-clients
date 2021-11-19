@@ -60,8 +60,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -81,6 +83,7 @@ import com.iiordanov.freeaSPICE.*;
 import com.iiordanov.CustomClientPackage.*;
 import com.undatech.opaque.ConnectionSettings;
 import com.undatech.opaque.ConnectionSetupActivity;
+import com.undatech.opaque.MessageDialogs;
 import com.undatech.opaque.RemoteClientLibConstants;
 import com.undatech.opaque.dialogs.MessageFragment;
 import com.undatech.opaque.util.FileUtils;
@@ -153,7 +156,7 @@ public class Utils {
                 dialog.dismiss();
                 Activity activity = Utils.getActivity(_context);
                 if (activity != null) {
-                    activity.finish();
+                    MessageDialogs.justFinish(activity);
                 }
             }
         });
@@ -253,7 +256,7 @@ public class Utils {
     }
 
     public static boolean isVnc(String packageName) {
-        return packageName.toLowerCase().contains("vnc");
+        return true;
     }
     
     public static boolean isRdp(String packageName) {
@@ -279,17 +282,9 @@ public class Utils {
                 return bVNC.class;
             }
         } else if (isRdp(packageName)) {
-            if (custom) {
-                throw new IllegalArgumentException("Custom SPICE clients not supported yet.");
-            } else {
-                return aRDP.class;
-            }
+            return aRDP.class;
         } else if (isSpice(packageName)) {
-            if (custom) {
-                throw new IllegalArgumentException("Custom SPICE clients not supported yet.");
-            } else {
-                return aSPICE.class;
-            }
+            return aSPICE.class;
         } else {
             throw new IllegalArgumentException("Could not find appropriate connection setup activity class for package " + packageName);
         }
@@ -551,4 +546,42 @@ public class Utils {
         }
         return result;
     }
+
+    public static String getStringFromMessage(Message msg, String key) {
+        Bundle s = msg.getData();
+        String value = "";
+        if (s != null) {
+            value = s.getString(key);
+        }
+        return value;
+    }
+
+    public static int getIntFromMessage(Message msg, String key) {
+        Bundle s = msg.getData();
+        int value = 0;
+        if (s != null) {
+            value = s.getInt(key);
+        }
+        return value;
+    }
+
+    public static boolean getBooleanFromMessage(Message msg, String key) {
+        Bundle s = msg.getData();
+        boolean value = false;
+        if (s != null) {
+            value = s.getBoolean(key);
+        }
+        return value;
+    }
+
+    public static String getStringResourceByName(Context context, String stringName) {
+        String packageName = context.getPackageName();
+        int resId = context.getResources().getIdentifier(stringName, "string", packageName);
+        String message = "";
+        if (resId > 0) {
+            message = context.getString(resId);
+        }
+        return message;
+    }
+
 }

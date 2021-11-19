@@ -1,10 +1,23 @@
+v5.0.5
+- Added Portuguese translation
+- Disabled highlighting of canvasing when focused so colors are not washed out
+- Moved to AndroidX libraries
+- Toolbar position is now remembered by default
+- Fixed SSH Intents for allowing blank passwords for base protocol
+- Fix for Send Text dialog buttons.
+v5.0.4
+- Fix for upper-case characters
+- FreeRDP Library update
+- Stability improvements
+- Master password fix
+- SQLCipher library update
 v5.0.3
 - Mandatory Android API target update
 - Usability fixes
 - Castillian Spanish localization
 - Android TV support improvements
 - RDP Library update
-- Feature to turn on/off debug logging
+- Feature to turn on/off debug input logging
 v5.0.2
 - Samsung DEX fixes
 - Better handling of Extra Keys visibility

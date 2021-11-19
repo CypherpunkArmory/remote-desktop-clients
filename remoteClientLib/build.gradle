@@ -8,7 +8,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.android.tools.build:gradle:4.1.3'
     }
 }
 
@@ -62,9 +62,9 @@ tasks.all { task ->
     }
 }
 dependencies {
-    implementation project(':freeRDPCore')
-    api 'com.android.support:multidex:2.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation project(':remoteClientLib:jni:libs:deps:FreeRDP:client:Android:Studio:freeRDPCore')
+    api 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'org.apache.httpcomponents:httpcore:4.4.10'
 }
 

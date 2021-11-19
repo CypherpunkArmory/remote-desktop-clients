@@ -264,6 +264,7 @@ build_one() {
         patch -p0 < "${basedir}/spice-gtk-log.patch"
         patch -p1 < "${basedir}/spice-gtk-exit.patch"
         patch -p1 < "${basedir}/spice-gtk-disable-agent-sync-audio-calls.patch"
+        patch -p0 < "${basedir}/spice-gtk-disable-mm-time-reset.patch"
         make $parallel
 
         # Patch to avoid SIGBUS due to unaligned accesses on ARM7
@@ -273,7 +274,7 @@ build_one() {
         make install
 
         # Put some header files in a version-independent location.
-        for f in config.h tools/*.h src/*.h spice-common/common subprojects/spice-common/common
+        for f in config.h _builddir/subprojects/spice-common/common _builddir/config.h tools/*.h src/*.h spice-common/common subprojects/spice-common/common
         do
             rsync -a $f ${root}/include/spice-1/ || true
         done
@@ -473,34 +474,52 @@ build() {
 
     if [ -f CERBERO_BUILT_${1} ]
     then
-      echo ; echo
-      echo "Cerbero was previously built. Remove $(realpath CERBERO_BUILT_${1}) if you want to rebuild it."
-      echo ; echo
+        echo ; echo
+        echo "Cerbero was previously built. Remove $(realpath CERBERO_BUILT_${1}) if you want to rebuild it."
+        echo ; echo
     else
-    # Build GStreamer SDK
-    if git clone https://gitlab.freedesktop.org/gstreamer/cerbero
-    then
-      pushd cerbero
-      git checkout 1.16
-      popd
-      cerbero/cerbero-uninstalled bootstrap
-      echo "allow_parallel_build = True" >>  cerbero/config/cross-android-universal.cbc
-      echo "toolchain_prefix = \"${ndkdir}\"" >> cerbero/config/cross-android-universal.cbc
-    fi
+        # Build GStreamer SDK
+        if git clone https://gitlab.freedesktop.org/gstreamer/cerbero
+        then
+            pushd cerbero
+            git checkout ${gstreamer_ver}
+            patch -p1 < ../cerbero-disable-assrender.patch
+            popd
+            cerbero/cerbero-uninstalled bootstrap
+            echo "allow_parallel_build = True" >>  cerbero/config/cross-android-universal.cbc
+            echo "toolchain_prefix = \"${ndkdir}\"" >> cerbero/config/cross-android-universal.cbc
+        fi
 
-    cerbero/cerbero-uninstalled -c cerbero/config/cross-android-universal.cbc build \
-      gstreamer-1.0 libxml2 libtasn1 pixman libsoup nettle gnutls openssl cairo json-glib gst-android-1.0 gst-plugins-bad-1.0 gst-plugins-good-1.0 gst-plugins-base-1.0 gst-plugins-ugly-1.0 gst-libav-1.0
+        echo "Copying local recipes into cerbero"
+        git clone https://github.com/iiordanov/remote-desktop-clients-cerbero-recipes.git recipes || true
+        pushd recipes
+        git pull
+        popd
+        rsync -avP recipes/ cerbero/recipes/
 
-    # Workaround for non-existent lib-pthread.la dpendency snaking its way into some of the libraries.
-    sed -i 's/[^ ]*lib-pthread.la//' cerbero/build/dist/android_universal/*/lib/*la
+        echo "Running cerbero build for $1 in $(pwd)"
+        cerbero/cerbero-uninstalled -c cerbero/config/cross-android-universal.cbc build \
+          gstreamer-1.0 glib glib-networking libxml2 pixman libsoup openssl cairo json-glib gst-android-1.0 gst-plugins-bad-1.0 gst-plugins-good-1.0 gst-plugins-base-1.0 gst-plugins-ugly-1.0 gst-libav-1.0 spiceglue
 
-    # Prepare gstreamer for current architecture
-    if [ ! -e "${gst}/lib/libglib-2.0.a" ] ; then
-        echo "Linking ../../cerbero/build/dist/android_universal/${gstarch} to ${gst}"
-        ln -sf "../../cerbero/build/dist/android_universal/${gstarch}" "${gst}"
-	ls -ld "${gst}"
-    fi
-    touch CERBERO_BUILT_${1}
+        echo "Copying spice-gtk header files that it does not install automatically"
+        SPICEDIR=$(ls -d1 cerbero/build/sources/android_universal/${gstarch}/spice-gtk-* | tail -n 1)
+
+        # Workaround for non-existent lib-pthread.la dpendency snaking its way into some of the libraries.
+        sed -i 's/[^ ]*lib-pthread.la//' cerbero/build/dist/android_universal/*/lib/*la
+
+        # Prepare gstreamer for current architecture
+        if [ ! -e "${gst}/lib/libglib-2.0.a" ] ; then
+            echo "Linking ../../cerbero/build/dist/android_universal/${gstarch} to ${gst}"
+            ln -sf "../../cerbero/build/dist/android_universal/${gstarch}" "${gst}"
+            ls -ld "${gst}"
+        fi
+
+
+        for f in ${SPICEDIR}/config.h ${SPICEDIR}/_builddir/subprojects/spice-common/common ${SPICEDIR}/_builddir/config.h ${SPICEDIR}/tools/*.h ${SPICEDIR}/src/*.h ${SPICEDIR}/spice-common/common ${SPICEDIR}/subprojects/spice-common/common
+        do
+            rsync -a $f ${gst}/include/spice-1/ || true
+        done
+        touch CERBERO_BUILT_${1}
     fi
 
     # Build
@@ -599,22 +618,14 @@ build_freerdp() {
 
         # Patch the config
         sed -i -e 's/CMAKE_BUILD_TYPE=.*/CMAKE_BUILD_TYPE=Release/'\
-               -e 's/WITH_OPENH264=.*/WITH_OPENH264=1/'\
                -e 's/WITH_JPEG=.*/WITH_JPEG=1/'\
-               -e 's/OPENH264_TAG=.*/OPENH264_TAG=v2.0.0/'\
-               -e 's/OPENSSL_TAG=.*/OPENSSL_TAG=OpenSSL_1_1_1g/'\
-               -e "s/BUILD_ARCH=.*/BUILD_ARCH=\"${abis}\"/" ./scripts/android-build.conf
+               -e 's/WITH_OPENH264=.*/WITH_OPENH264=1/'\
+               -e 's/OPENH264_TAG=.*/OPENH264_TAG=v2.1.1/'\
+               -e 's/NDK_TARGET=26/NDK_TARGET=21/'\
+                ./scripts/android-build.conf
 
-
-        #echo 'set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWINPR_EXPORTS --sysroot=${ANDROID_SYSROOT}")' >>  winpr/CMakeLists.txt
-        #for f in winpr/CMakeLists.txt winpr/libwinpr/CMakeLists.txt libfreerdp/CMakeLists.txt client/common/CMakeLists.txt client/Android/CMakeLists.txt client/common/CMakeLists.txt
-        #do
-        #    echo 'set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --sysroot=${ANDROID_SYSROOT}")' >> $f
-        #    echo 'set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} --sysroot=${ANDROID_SYSROOT}")' >> $f
-        #done
-
-        # Something wrong with NDK?
-        #sed -i 's/static int pthread_mutex_timedlock/int pthread_mutex_timedlock/' winpr/libwinpr/synch/wait.c
+#               -e 's/OPENSSL_TAG=.*/OPENSSL_TAG=OpenSSL_1_1_1g/'\
+#               -e "s/BUILD_ARCH=.*/BUILD_ARCH=\"${abis}\"/"\
 
         for f in ${basedir}/../*_freerdp_*.patch
         do
@@ -629,6 +640,7 @@ build_freerdp() {
 
         echo "Installing android NDK ${freerdp_ndk_version} for FreeRDP build compatibility"
         export ANDROID_NDK=$(install_ndk ../../ ${freerdp_ndk_version})
+        export OPENH264_NDK=$(install_ndk ../../ ${freerdp_openh264_ndk_version})
         echo "Android NDK version for FreeRDP ${ndk_version} is installed at ${ANDROID_NDK}"
         echo "Installing cmake ${freerdp_cmake_version} for FreeRDP build compatibility"
         export CMAKE_PATH=$(install_cmake ../../ ${freerdp_cmake_version})/bin

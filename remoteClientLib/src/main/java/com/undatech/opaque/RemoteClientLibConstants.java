@@ -44,6 +44,7 @@ public class RemoteClientLibConstants {
     public static final int DISCONNECT_WITH_MESSAGE = 18;
     public static final int GET_RDP_CREDENTIALS    = 19;
     public static final int GET_SPICE_PASSWORD     = 20;
+    public static final int REPORT_TOOLBAR_POSITION = 21;
 
     public static final int LAUNCH_VNC_VIEWER      = 23;
     public static final int VM_LAUNCHED            = 24;
@@ -69,6 +70,7 @@ public class RemoteClientLibConstants {
     public static final int DIALOG_DISPLAY_VMS     = 44;
     public static final int SPICE_TLS_ERROR        = 45;
     public static final int SPICE_CONNECT_FAILURE_IF_MAINTAINING_CONNECTION = 46;
+    public static final int SHOW_TOAST             = 47;
     public static final int PRO_FEATURE            = 99;
 
     public static final int EXTRA_KEYS_OFF         = 0;

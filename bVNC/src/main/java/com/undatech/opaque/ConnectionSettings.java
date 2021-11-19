@@ -28,6 +28,8 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.iiordanov.bVNC.Constants;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,6 +57,7 @@ public class ConnectionSettings implements Connection, Serializable {
     private String vmname = "";
     private String user = "";
     private String password = "";
+    private boolean keepPassword = false;
     private String otpCode = "";
     private String inputMethod = "DirectSwipePan";
     private boolean rotationEnabled = true;
@@ -63,7 +66,6 @@ public class ConnectionSettings implements Connection, Serializable {
     private boolean usingCustomOvirtCa = false;
     private boolean sslStrict = true;
     private boolean usbEnabled = true;
-
     private String ovirtCaFile = "";
     private String ovirtCaData = "";
     private String layoutMap = "";
@@ -72,7 +74,16 @@ public class ConnectionSettings implements Connection, Serializable {
     private String x509KeySignature = "";
 
     private int extraKeysToggleType = RemoteClientLibConstants.EXTRA_KEYS_ON;
-    
+
+    private int rdpWidth = 0;
+    private int rdpHeight = 0;
+    private int rdpResType = Constants.RDP_GEOM_SELECT_CUSTOM;
+
+    private boolean useLastPositionToolbar = true;
+    private int useLastPositionToolbarX;
+    private int useLastPositionToolbarY;
+    private boolean useLastPositionToolbarMoved = false;
+
     public ConnectionSettings(String filename) {
         super();
         this.filename = filename;
@@ -214,12 +225,12 @@ public class ConnectionSettings implements Connection, Serializable {
 
     @Override
     public boolean getKeepPassword() {
-        return false;
+        return keepPassword;
     }
 
     @Override
     public void setKeepPassword(boolean keepPassword) {
-
+        this.keepPassword = keepPassword;
     }
 
     @Override
@@ -334,6 +345,46 @@ public class ConnectionSettings implements Connection, Serializable {
     }
 
     @Override
+    public boolean getUseLastPositionToolbar() {
+        return useLastPositionToolbar;
+    }
+
+    @Override
+    public void setUseLastPositionToolbar(boolean useLastPositionToolbar) {
+        this.useLastPositionToolbar = useLastPositionToolbar;
+    }
+
+    @Override
+    public int getUseLastPositionToolbarX() {
+        return useLastPositionToolbarX;
+    }
+
+    @Override
+    public void setUseLastPositionToolbarX(int useLastPositionToolbarX) {
+        this.useLastPositionToolbarX = useLastPositionToolbarX;
+    }
+
+    @Override
+    public int getUseLastPositionToolbarY() {
+        return useLastPositionToolbarY;
+    }
+
+    @Override
+    public void setUseLastPositionToolbarY(int useLastPositionToolbarY) {
+        this.useLastPositionToolbarY = useLastPositionToolbarY;
+    }
+
+    @Override
+    public void setUseLastPositionToolbarMoved(boolean useLastPositionToolbarMoved) {
+        this.useLastPositionToolbarMoved = useLastPositionToolbarMoved;
+    }
+
+    @Override
+    public boolean getUseLastPositionToolbarMoved() {
+        return useLastPositionToolbarMoved;
+    }
+
+    @Override
     public void saveAndWriteRecent(boolean saveEmpty, Context c) {
         save(c);
     }
@@ -351,7 +402,13 @@ public class ConnectionSettings implements Connection, Serializable {
         editor.putString("hostname", hostname);
         editor.putString("vmname", vmname);
         editor.putString("user", user);
-        editor.putString("password", password);
+        if (keepPassword) {
+            editor.putString("password", password);
+        }
+        else {
+            editor.putString("password", "");
+        }
+        editor.putBoolean("keepPassword", keepPassword);
         editor.putInt("extraKeysToggleType", extraKeysToggleType);
         editor.putString("inputMethod", inputMethod);
         editor.putBoolean("rotationEnabled", rotationEnabled);
@@ -365,11 +422,24 @@ public class ConnectionSettings implements Connection, Serializable {
         editor.putString("scaleMode", scaleMode);
         editor.putString("x509KeySignature", x509KeySignature);
         editor.putString("screenshotFilename", screenshotFilename);
+        editor.putInt("rdpWidth", rdpWidth);
+        editor.putInt("rdpHeight", rdpHeight);
+        editor.putInt("rdpResType", rdpResType);
+        editor.putBoolean("useLastPositionToolbar", useLastPositionToolbar);
+        editor.putInt("useLastPositionToolbarX", useLastPositionToolbarX);
+        editor.putInt("useLastPositionToolbarY", useLastPositionToolbarY);
+        if (useLastPositionToolbar) {
+            editor.putBoolean("useLastPositionToolbarMoved", useLastPositionToolbarMoved);
+        }
+        else {
+            editor.putBoolean("useLastPositionToolbarMoved", false);
+        }
         editor.apply();
         // Make sure the CA gets saved to a file if necessary.
         ovirtCaFile = saveCaToFile (context, ovirtCaData);
     }
 
+    @Override
     public void load(Context context) {
         loadFromSharedPreferences(context);
     }
@@ -416,12 +486,12 @@ public class ConnectionSettings implements Connection, Serializable {
 
     @Override
     public int getRdpResType() {
-        return 0;
+        return rdpResType;
     }
 
     @Override
     public void setRdpResType(int rdpResType) {
-
+        this.rdpResType = rdpResType;
     }
 
     @Override
@@ -542,6 +612,13 @@ public class ConnectionSettings implements Connection, Serializable {
         vmname = sp.getString("vmname", "").trim();
         user = sp.getString("user", "").trim();
         password = sp.getString("password", "");
+        keepPassword = sp.getBoolean("keepPassword", false);
+        // keepPassword field did not exist before, set it to default False but we can assume if
+        // password field is set, the user intended to save the password and we can assume
+        // keepPassword should be set to true when loading a connection
+        if (!sp.contains("keepPassword") && !password.isEmpty()) {
+            keepPassword = true;
+        }
         x509KeySignature = sp.getString("x509KeySignature", "").trim();
         screenshotFilename = sp.getString("screenshotFilename", UUID.randomUUID().toString() + ".png").trim();
         loadAdvancedSettings (context, filename);
@@ -560,6 +637,13 @@ public class ConnectionSettings implements Connection, Serializable {
         ovirtCaData = sp.getString("ovirtCaData", "").trim();
         layoutMap = sp.getString("layoutMap", RemoteClientLibConstants.DEFAULT_LAYOUT_MAP).trim();
         scaleMode = sp.getString("scaleMode", ImageView.ScaleType.MATRIX.toString()).trim();
+        rdpWidth = sp.getInt("rdpWidth", 0);
+        rdpHeight = sp.getInt("rdpHeight", 0);
+        rdpResType = sp.getInt("rdpResType", Constants.RDP_GEOM_SELECT_CUSTOM);
+        useLastPositionToolbar = sp.getBoolean("useLastPositionToolbar", true);
+        useLastPositionToolbarX = sp.getInt("useLastPositionToolbarX", 0);
+        useLastPositionToolbarY = sp.getInt("useLastPositionToolbarY", 0);
+        useLastPositionToolbarMoved = sp.getBoolean("useLastPositionToolbarMoved", false);
         // Make sure the CAs get saved to files if necessary.
         ovirtCaFile = saveCaToFile (context, ovirtCaData);
     }
@@ -656,22 +740,22 @@ public class ConnectionSettings implements Connection, Serializable {
 
     @Override
     public int getRdpWidth() {
-        return 0;
+        return rdpWidth;
     }
 
     @Override
     public void setRdpWidth(int rdpWidth) {
-
+        this.rdpWidth = rdpWidth;
     }
 
     @Override
     public int getRdpHeight() {
-        return 0;
+        return rdpHeight;
     }
 
     @Override
     public void setRdpHeight(int rdpHeight) {
-
+        this.rdpHeight = rdpHeight;
     }
 
     @Override

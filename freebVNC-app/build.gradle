@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:multidex:1.0.3'
+    api 'androidx.multidex:multidex:2.0.0'
     implementation project(':bVNC')
     implementation project(':pubkeyGenerator')
 }
