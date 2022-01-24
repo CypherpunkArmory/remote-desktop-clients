@@ -3,14 +3,14 @@
 DIR=$(dirname $0)
 pushd $DIR
 
-DEPVER=12
+DEPVER=1
 
-if $(which wget)
-then
-  wget -c https://github.com/iiordanov/remote-desktop-clients/releases/download/dependencies/remote-desktop-clients-libs-${DEPVER}.tar.gz
-else
-  curl -L https://github.com/iiordanov/remote-desktop-clients/releases/download/dependencies/remote-desktop-clients-libs-${DEPVER}.tar.gz -o remote-desktop-clients-libs-${DEPVER}.tar.gz
-fi
+#if $(which wget)
+#then
+  #wget -c https://github.com/iiordanov/remote-desktop-clients/releases/download/dependencies/remote-desktop-clients-libs-${DEPVER}.tar.gz
+#else
+  #curl -L https://github.com/iiordanov/remote-desktop-clients/releases/download/dependencies/remote-desktop-clients-libs-${DEPVER}.tar.gz -o remote-desktop-clients-libs-${DEPVER}.tar.gz
+#fi
 
 rm -rf remoteClientLib/jni/libs/deps/FreeRDP/
 mkdir -p remoteClientLib/jni/libs/deps/FreeRDP/
