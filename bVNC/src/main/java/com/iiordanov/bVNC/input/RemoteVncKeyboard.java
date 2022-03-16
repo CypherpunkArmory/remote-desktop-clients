@@ -36,6 +36,11 @@ public class RemoteVncKeyboard extends RemoteKeyboard {
             if (keyCode == KeyEvent.KEYCODE_MENU)
                 return true;                           // Ignore menu key
 
+            //allow volume up and down to do the normal thing
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                return false;
+            }
+
             if (pointer.hardwareButtonsAsMouseEvents(keyCode, evt, metaState|onScreenMetaState|hardwareMetaState))
                 return true;
 
