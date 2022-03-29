@@ -4,6 +4,7 @@ bin
 gen
 dist
 *~
+remote-desktop-clients-libs-*.tar.gz
 remoteClientLib/libs
 remoteClientLib/jni/libs/deps/
 remoteClientLib/jni/libs/cerbero/
