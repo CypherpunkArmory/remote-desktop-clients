@@ -314,6 +314,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         connection = null;
         
         Uri data = i.getData();
+        Bundle extras = i.getExtras();
+
+        if (extras != null) {
+            Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
+        }
         
         boolean isSupportedScheme = false;
         if (data != null) {
@@ -361,7 +366,6 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         } else {
             Log.d(TAG, "Initializing classic connection from Serializeable.");
         	connection = new ConnectionBean(this);
-            Bundle extras = i.getExtras();
 
             if (extras != null) {
                 Log.d(TAG, "Initializing classic connection from Serializeable, loading values.");
