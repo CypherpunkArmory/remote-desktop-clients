@@ -394,6 +394,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         }
         ((RemoteCanvasHandler) handler).setConnection(connection);
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
+        AbstractScaling.getById(R.id.itemZoomable).setScaleTypeForActivity(this);
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

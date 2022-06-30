@@ -44,7 +44,7 @@ class ZoomScaling extends AbstractScaling {
     float minimumScale;
     
     public ZoomScaling() {
-        super(R.id.itemZoomable, ScaleType.MATRIX);
+        super(R.id.itemFitToScreen, ScaleType.MATRIX);
         matrix = new Matrix();
         scaling = 1;
     }

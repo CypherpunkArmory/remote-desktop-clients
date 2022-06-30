@@ -36,7 +36,7 @@ import com.undatech.remoteClientUi.*;
  * A scaling mode for the VncCanvas; based on ImageView.ScaleType
  */
 public abstract class AbstractScaling {
-    private static final int scaleModeIds[] = { R.id.itemFitToScreen, R.id.itemOneToOne, R.id.itemZoomable };
+    private static final int scaleModeIds[] = { R.id.itemOneToOne, R.id.itemZoomable, R.id.itemFitToScreen };
     
     private static AbstractScaling[] scalings;
 

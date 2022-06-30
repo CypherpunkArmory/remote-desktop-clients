@@ -31,8 +31,8 @@
     <item android:numericShortcut="4" android:alphabeticShortcut="z" android:id="@+id/itemScaling" android:title="@string/scaling" android:icon="@android:drawable/ic_menu_zoom">
     	<menu>
 	    	<group android:id="@+id/groupScaling" android:checkableBehavior="single">
+                <item android:id="@+id/itemFitToScreen" android:title="@string/fit_to_screen" android:checked="true"/>
 	    		<item android:id="@+id/itemZoomable" android:title="@string/scaling_zoomable" />
-	    		<item android:id="@+id/itemFitToScreen" android:title="@string/fit_to_screen" android:checked="true"/>
                 <item android:id="@+id/itemOneToOne" android:title="@string/one_to_one"/>
 	    	</group>
     	</menu>
