@@ -202,6 +202,7 @@ public class Constants {
     public static final String rAltAsIsoL3ShiftTag = "rAltAsIsoL3Shift";
     public static final String leftHandedModeTag = "leftHandedModeTag";
     public static final String defaultInputMethodTag = "defaultInputMethod";
+    public static final String showToolbarDisabledTag = "showToolbarDisabled";
     public static final String permissionsRequested = "permissionsRequested";
     public static final String positionToolbarLastUsed = "positionToolbarLastUsed";
 

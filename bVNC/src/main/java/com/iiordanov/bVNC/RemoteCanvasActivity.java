@@ -73,6 +73,7 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.WindowManager;
@@ -123,6 +124,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     private MenuItem[] inputModeMenuItems;
     private MenuItem[] scalingModeMenuItems;
     private InputHandler inputModeHandlers[];
+    private Handler commandHandler;
     private Connection connection;
     public static final int[] inputModeIds = { R.id.itemInputTouchpad,
                                                 R.id.itemInputTouchPanZoomMouse,
@@ -232,6 +234,24 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         }
     }
 
+    private String commandDir = "";
+    private Runnable commandChecker = new Runnable() {
+        @Override
+        public void run() {
+            File showKeyboard = new File(commandDir+"/showKeyboard");
+            if (showKeyboard.exists()) {
+                showKeyboard.delete();
+                showKeyboard();
+            }
+            File hideKeyboard = new File(commandDir+"/hideKeyboard");
+            if (hideKeyboard.exists()) {
+                hideKeyboard.delete();
+                hideKeyboard();
+            }
+            commandHandler.postDelayed(commandChecker, 100);
+        }
+    };
+
     @Override
     public void onCreate(Bundle icicle) {
         Log.d(TAG, "OnCreate called");
@@ -250,7 +270,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
 
         canvas = (RemoteCanvas) findViewById(R.id.canvas);
 
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             canvas.setDefaultFocusHighlightEnabled(false);
         }
         if (android.os.Build.VERSION.SDK_INT >= 9) {
@@ -289,6 +309,16 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
                 }
             }};
 
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+
+        if (extras != null) {
+            commandDir = extras.getString("command_dir", "");
+        }
+
+        commandHandler = new Handler();
+        commandChecker.run();
+
         if (Utils.isOpaque(getPackageName())) {
             initializeOpaque(setModes, hideKeyboardAndExtraKeys);
         } else {
@@ -317,6 +347,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         Bundle extras = i.getExtras();
 
         if (extras != null) {
+            Utils.setSharedPreferenceBoolean(this, Constants.showToolbarDisabledTag, extras.getBoolean("hide_toolbar",false));
             Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
         }
         
@@ -392,7 +423,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
             if (connection.getSshPort() == 0)
                 connection.setSshPort(Constants.DEFAULT_SSH_PORT);
         }
+        if (extras != null) {
+            connection.setExtraKeysToggleType(extras.getBoolean("hide_extra_keys", false) ? Constants.EXTRA_KEYS_OFF : Constants.EXTRA_KEYS_ON);
+        }
         ((RemoteCanvasHandler) handler).setConnection(connection);
+        connection.setPrefEncoding(RfbProto.EncodingRaw);
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
     }
 
@@ -1484,6 +1519,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        commandHandler.removeCallbacks(commandChecker);
         if (canvas != null)
             canvas.closeConnection();
         System.gc();
@@ -1615,7 +1651,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     ToolbarHiderRunnable toolbarHider = new ToolbarHiderRunnable();
     
     public void showToolbar() {
-        getSupportActionBar().show();
+        boolean extraKeysVisible = layoutKeys.getVisibility() == View.VISIBLE;
+        boolean showToolbarDisabled = isShowToolbarDisabled();
+        if (!showToolbarDisabled || extraKeysVisible) {
+            getSupportActionBar().show();
+        }
         handler.removeCallbacks(toolbarHider);
         handler.postAtTime(toolbarHider, SystemClock.uptimeMillis() + hideToolbarDelay);
     }
@@ -1663,7 +1703,8 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         canvas.requestFocus();
         inputMgr.hideSoftInputFromWindow(canvas.getWindowToken(), 0);
         softKeyboardUp = false;
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        if (getSupportActionBar() != null)
+            Objects.requireNonNull(getSupportActionBar()).hide();
     }
 
     public void hideKeyboardAndExtraKeys() {
@@ -1713,6 +1754,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     private boolean isMasterPasswordEnabled() {
         SharedPreferences sp = getSharedPreferences(Constants.generalSettingsTag, Context.MODE_PRIVATE);
         return sp.getBoolean(Constants.masterPasswordEnabledTag, false);
+    }
+
+    private boolean isShowToolbarDisabled() {
+        SharedPreferences sp = getSharedPreferences(Constants.generalSettingsTag, Context.MODE_PRIVATE);
+        return sp.getBoolean(Constants.showToolbarDisabledTag, false);
     }
 
     @Override

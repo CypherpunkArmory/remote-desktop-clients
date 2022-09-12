@@ -114,7 +114,7 @@ public class ConnectionBean extends AbstractConnectionBean implements Connection
         setCertSubject("");
         setColorModel(COLORMODEL.C24bit.nameString());
         setPrefEncoding(RfbProto.EncodingRaw);
-        setScaleMode(ScaleType.MATRIX);
+        setScaleMode(ScaleType.FIT_CENTER);
         setInputMode(inputMode);
         setUseDpadAsArrows(true);
         setRotateDpad(false);
