@@ -393,6 +393,7 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
                 connection.setSshPort(Constants.DEFAULT_SSH_PORT);
         }
         ((RemoteCanvasHandler) handler).setConnection(connection);
+        connection.setPrefEncoding(RfbProto.EncodingRaw);
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
         AbstractScaling.getById(R.id.itemZoomable).setScaleTypeForActivity(this);
     }
