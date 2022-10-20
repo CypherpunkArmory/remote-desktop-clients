@@ -53,6 +53,7 @@ import android.graphics.RectF;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -64,7 +65,9 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.DisplayCutout;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -225,12 +228,21 @@ public class RemoteCanvas extends AppCompatImageView
         isSpice = Utils.isSpice(getContext().getPackageName());
         isOpaque = Utils.isOpaque(getContext().getPackageName());
 
-        final Display display = ((Activity) context).getWindow().getWindowManager().getDefaultDisplay();
-        displayWidth = display.getWidth();
-        displayHeight = display.getHeight();
+        final WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        final Display display = windowManager.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
+        display.getRealMetrics(metrics);
+        displayHeight = metrics.heightPixels;
+        displayWidth = metrics.widthPixels;
         displayDensity = metrics.density;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            DisplayCutout displayCutout = display.getCutout();
+            if (displayCutout != null) {
+                displayHeight -= displayCutout.getSafeInsetBottom() + displayCutout.getSafeInsetTop();
+                displayWidth -= displayCutout.getSafeInsetLeft() + displayCutout.getSafeInsetRight();
+            }
+        }
 
         // Startup the connection thread with a progress dialog
         pd = ProgressDialog.show(getContext(), getContext().getString(R.string.info_progress_dialog_connecting),
