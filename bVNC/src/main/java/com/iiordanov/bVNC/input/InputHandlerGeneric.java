@@ -107,8 +107,12 @@ abstract class InputHandlerGeneric extends GestureDetector.SimpleOnGestureListen
 	// These variables keep track of which pointers have seen ACTION_DOWN events.
 	protected boolean secondPointerWasDown = false;
 	protected boolean thirdPointerWasDown  = false;
-	
-    // What the display density is.
+
+	// If you need fast reactions and you do not support double taps,
+	// than onSingleTapUp will give you the event faster
+	protected boolean useSingleTapUp = false;
+
+	// What the display density is.
     float displayDensity = 0;
     
     // Indicates that the next onFling will be disregarded.
@@ -297,19 +301,37 @@ abstract class InputHandlerGeneric extends GestureDetector.SimpleOnGestureListen
     	}
         pointer.releaseButton(x, y, meta);
 	}
-	
+
 	/*
 	 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
 	 */
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e) {
-        int metaState   = e.getMetaState();
+		if (useSingleTapUp)
+			return super.onSingleTapConfirmed(e);
+		int metaState   = e.getMetaState();
+		activity.showToolbar();
+		pointer.leftButtonDown(getX(e), getY(e), metaState);
+		SystemClock.sleep(20);
+		pointer.releaseButton(getX(e), getY(e), metaState);
+		canvas.movePanToMakePointerVisible();
+		return true;
+	}
+
+	/*
+	 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapUp(android.view.MotionEvent)
+	 */
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		if (!useSingleTapUp)
+			return super.onSingleTapUp(e);
+		int metaState   = e.getMetaState();
 		activity.showToolbar();
 		pointer.leftButtonDown(getX(e), getY(e), metaState);
 		SystemClock.sleep(50);
 		pointer.releaseButton(getX(e), getY(e), metaState);
-    	canvas.movePanToMakePointerVisible();
-    	return true;
+		canvas.movePanToMakePointerVisible();
+		return true;
 	}
 
 	/*
@@ -317,7 +339,9 @@ abstract class InputHandlerGeneric extends GestureDetector.SimpleOnGestureListen
 	 */
 	@Override
 	public boolean onDoubleTap (MotionEvent e) {
-        int metaState   = e.getMetaState();
+		if (useSingleTapUp)
+			return false;
+		int metaState   = e.getMetaState();
 		pointer.leftButtonDown(getX(e), getY(e), metaState);
 		SystemClock.sleep(50);
 		pointer.releaseButton(getX(e), getY(e), metaState);
@@ -325,8 +349,8 @@ abstract class InputHandlerGeneric extends GestureDetector.SimpleOnGestureListen
 		pointer.leftButtonDown(getX(e), getY(e), metaState);
 		SystemClock.sleep(50);
 		pointer.releaseButton(getX(e), getY(e), metaState);
-    	canvas.movePanToMakePointerVisible();
-    	return true;
+		canvas.movePanToMakePointerVisible();
+		return true;
 	}
 
 	/*

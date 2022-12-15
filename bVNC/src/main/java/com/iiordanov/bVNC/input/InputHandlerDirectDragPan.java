@@ -41,6 +41,9 @@ public class InputHandlerDirectDragPan extends InputHandlerGeneric {
 	public InputHandlerDirectDragPan(RemoteCanvasActivity activity, RemoteCanvas canvas,
 									 RemotePointer pointer) {
 		super(activity, canvas, pointer);
+		// Disable support for double tapping (faster response, no missed events)
+		useSingleTapUp = true;
+		gestureDetector.setOnDoubleTapListener(null);
 	}
 
 	/*
