@@ -318,6 +318,13 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
 
         if (extras != null) {
             Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
+            if (extras.getBoolean("display_locked", false)) {
+                if (extras.getInt("display_orientation", Configuration.ORIENTATION_LANDSCAPE) == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                }
+            }
         }
         
         boolean isSupportedScheme = false;
