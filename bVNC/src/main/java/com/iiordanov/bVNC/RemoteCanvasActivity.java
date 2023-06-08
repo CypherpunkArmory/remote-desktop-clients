@@ -315,17 +315,6 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         
         Uri data = i.getData();
         Bundle extras = i.getExtras();
-
-        if (extras != null) {
-            Utils.setSharedPreferenceString(this, Constants.defaultInputMethodTag, extras.getString("input_mode", InputHandlerDirectSwipePan.ID));
-            if (extras.getBoolean("display_locked", false)) {
-                if (extras.getInt("display_orientation", Configuration.ORIENTATION_LANDSCAPE) == Configuration.ORIENTATION_LANDSCAPE) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                } else {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                }
-            }
-        }
         
         boolean isSupportedScheme = false;
         if (data != null) {
@@ -403,6 +392,17 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         connection.setPrefEncoding(RfbProto.EncodingRaw);
         canvas.initializeCanvas(connection, setModes, hideKeyboardAndExtraKeys);
         AbstractScaling.getById(R.id.itemZoomable).setScaleTypeForActivity(this);
+
+        if (extras != null) {
+            setInputMode(extras.getInt("input_mode", com.undatech.remoteClientUi.R.id.itemInputTouchPanZoomMouse));
+            if (extras.getBoolean("display_locked", false)) {
+                if (extras.getInt("display_orientation", Configuration.ORIENTATION_LANDSCAPE) == Configuration.ORIENTATION_LANDSCAPE) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                }
+            }
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
