@@ -1,11 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    namespace 'com.iiordanov.pubkeygenerator'
+
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 29
+        targetSdkVersion 34
     }
 
     buildTypes {
@@ -15,14 +17,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 buildscript {
     repositories {
         mavenCentral()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.google.gradle:osdetector-gradle-plugin:1.4.0'
@@ -33,7 +36,7 @@ buildscript {
 apply plugin: "com.google.osdetector"
 
 dependencies {
-    api 'org.connectbot:sshlib:2.2.13'
+    api 'org.connectbot:sshlib:2.2.23'
     // https://mvnrepository.com/artifact/com.madgag.spongycastle/core
     api group: 'com.madgag.spongycastle', name: 'core', version: '1.58.0.0'
     api group: 'com.madgag.spongycastle', name: 'prov', version: '1.58.0.0'

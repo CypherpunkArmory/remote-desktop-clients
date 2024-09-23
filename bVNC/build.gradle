@@ -1,10 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    namespace 'com.undatech.remoteClientUi'
+
+    compileSdkVersion 34
 
     defaultConfig {
-        targetSdkVersion 29
+        targetSdkVersion 34
         minSdkVersion project.getProperties().get("SDK_VERSION")
         vectorDrawables.useSupportLibrary = true
     }
@@ -28,8 +30,8 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
@@ -53,4 +55,7 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.23'
     implementation 'org.apache.httpcomponents:httpcore:4.4.10'
     implementation "com.github.luben:zstd-jni:1.4.3-1@aar"
+}
+repositories {
+    mavenCentral()
 }

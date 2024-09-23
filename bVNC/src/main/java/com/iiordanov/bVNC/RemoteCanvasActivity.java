@@ -235,12 +235,12 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
     @Override
     public void onCreate(Bundle icicle) {
         Log.d(TAG, "OnCreate called");
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(icicle);
         // TODO: Implement left-icon
         //requestWindowFeature(Window.FEATURE_LEFT_ICON);
         //setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.icon);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
 

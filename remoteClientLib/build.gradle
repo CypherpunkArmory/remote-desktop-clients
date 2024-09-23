@@ -4,7 +4,7 @@ apply plugin: 'com.android.library'
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
@@ -14,16 +14,19 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
         google()
     }
 }
 
 android {
-    compileSdkVersion 29
+    namespace 'com.undatech.remoteClientLib'
+
+    compileSdkVersion 34
 
     defaultConfig {
-        targetSdkVersion 29
+        targetSdkVersion 34
         minSdkVersion project.getProperties().get("SDK_VERSION")
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' ,'x86_64'
         multiDexEnabled true

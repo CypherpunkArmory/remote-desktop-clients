@@ -262,11 +262,11 @@ public class PubkeyUtils {
 
         if (pk instanceof RSAPublicKey) {
             String data = "ssh-rsa ";
-            data += String.valueOf(Base64.encode(RSASHA1Verify.encodeSSHRSAPublicKey((RSAPublicKey)pk)));
+            data += String.valueOf(Base64.encode(RSASHA1Verify.get().encodePublicKey((RSAPublicKey)pk)));
             return data + " " + nickname;
         } else if (pk instanceof DSAPublicKey) {
             String data = "ssh-dss ";
-            data += String.valueOf(Base64.encode(DSASHA1Verify.encodeSSHDSAPublicKey((DSAPublicKey)pk)));
+            data += String.valueOf(Base64.encode(DSASHA1Verify.get().encodePublicKey((DSAPublicKey) pk)));
             return data + " " + nickname;
         }
 
