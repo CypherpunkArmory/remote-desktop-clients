@@ -94,19 +94,19 @@ public enum COLORMODEL {
     public String toString() {
         switch (this) {
         case C24bit:
-            return App.getContext().getString(R.string.color_24_bit);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_24_bit);
         case C256:
-            return App.getContext().getString(R.string.color_256);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_256);
         case C64:
-            return App.getContext().getString(R.string.color_64);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_64);
         case C8:
-            return App.getContext().getString(R.string.color_8);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_8);
         case C4:
-            return App.getContext().getString(R.string.color_greyscale);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_greyscale);
         case C2:
-            return App.getContext().getString(R.string.color_black_and_white);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_black_and_white);
         default:
-            return App.getContext().getString(R.string.color_24_bit);
+            return RemoteCanvasActivity.getContext().getString(R.string.color_24_bit);
         }
     }
 }

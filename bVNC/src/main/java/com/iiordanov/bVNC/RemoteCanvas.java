@@ -1629,7 +1629,12 @@ public class RemoteCanvas extends AppCompatImageView
             android.util.Log.d(TAG, "drawableSetter.run");
             if (myDrawable != null) {
                 android.util.Log.d(TAG, "drawableSetter myDrawable not null");
-                myDrawable.setImageDrawable(RemoteCanvas.this);
+                try {
+                    myDrawable.setImageDrawable(RemoteCanvas.this);
+                } catch (NullPointerException e) {
+                    //TODO - this shouldn't happen, but maybe is happening due to a race case between this an closeConnection
+                    android.util.Log.e(TAG, "drawableSetter myDrawable or this is null");
+                }
             } else {
                 android.util.Log.e(TAG, "drawableSetter myDrawable is null");
             }

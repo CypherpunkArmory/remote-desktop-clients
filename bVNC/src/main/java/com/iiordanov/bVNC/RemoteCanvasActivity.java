@@ -25,6 +25,7 @@ package com.iiordanov.bVNC;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
@@ -237,6 +238,9 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         Log.d(TAG, "OnCreate called");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(icicle);
+
+        context = new WeakReference<Context>(this);
+
         // TODO: Implement left-icon
         //requestWindowFeature(Window.FEATURE_LEFT_ICON);
         //setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, R.drawable.icon);
@@ -1729,5 +1733,11 @@ public class RemoteCanvasActivity extends AppCompatActivity implements OnKeyList
         if (inputHandler != null) {
             inputHandler.onKeyDown(KeyEvent.KEYCODE_BACK, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
         }
+    }
+
+    private static WeakReference<Context> context;
+
+    public static Context getContext() {
+        return context.get();
     }
 }

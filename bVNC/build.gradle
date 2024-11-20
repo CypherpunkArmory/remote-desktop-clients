@@ -3,10 +3,10 @@ apply plugin: 'com.android.library'
 android {
     namespace 'com.undatech.remoteClientUi'
 
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     defaultConfig {
-        targetSdkVersion 34
+        targetSdkVersion 35
         minSdkVersion project.getProperties().get("SDK_VERSION")
         vectorDrawables.useSupportLibrary = true
     }
