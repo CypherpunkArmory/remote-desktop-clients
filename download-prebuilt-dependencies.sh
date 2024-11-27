@@ -3,7 +3,7 @@
 DIR=$(dirname $0)
 pushd $DIR
 
-DEPVER=2
+DEPVER=4
 
 #if $(which wget)
 #then
